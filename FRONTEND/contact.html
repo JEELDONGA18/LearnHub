@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us | LearnHub</title>
+  <style>
+    /* ====== BASE ====== */
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #fff9f5;
+      color: #333;
+    }
+    
+    /* ====== HERO SECTION ====== */
+    .hero {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: white;
+      text-align: center;
+      padding: 80px 10%;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+    }
+
+    /* ====== CONTACT SECTION ====== */
+    .contact {
+      padding: 60px 10%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .contact-form {
+      flex: 1 1 45%;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .contact-form h3 {
+      color: #ff6600;
+      margin-bottom: 20px;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 95%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .contact-form textarea {
+      height: 120px;
+      resize: none;
+    }
+
+    .contact-form button {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .contact-form button:hover {
+      background: #ff751a;
+    }
+
+    .contact-info {
+      flex: 1 1 40%;
+      padding: 30px;
+    }
+
+    .contact-info h3 {
+      color: #ff6600;
+      margin-bottom: 20px;
+    }
+
+    .contact-info p {
+      margin: 10px 0;
+      font-size: 1rem;
+      color: #ccc;
+    }
+
+    .contact-info i {
+      color: #ff6600;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <script>
+  fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => document.getElementById('navbar').innerHTML = data);
+  </script>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Contact Us</h2>
+    <p>We’d love to hear from you! Get in touch for support, feedback, or partnership inquiries.</p>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact">
+    <div class="contact-form">
+      <h3>Send Us a Message</h3>
+      <form>
+        <input type="text" placeholder="Your Name" required />
+        <input type="email" placeholder="Your Email" required />
+        <input type="text" placeholder="Subject" required />
+        <textarea placeholder="Your Message" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+    </div>
+
+    <div class="contact-info">
+      <h3>Get in Touch</h3>
+      <p><i>📍</i> 123 Edu Street, Knowledge City, India</p>
+      <p><i>📞</i> +91 98765 43210</p>
+      <p><i>📧</i> support@learnhub.com</p>
+      <h3>Follow Us</h3>
+      <p>🌐 Facebook | Twitter | Instagram | LinkedIn</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div id="footer"></div>
+
+  <script>
+  fetch('footer.html')
+    .then(response => response.text())
+    .then(data => document.getElementById('footer').innerHTML = data);
+  </script>
+</body>
+</html>
