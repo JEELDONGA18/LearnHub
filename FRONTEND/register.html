@@ -4,104 +4,76 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register | LearnHub</title>
-  <!-- Include CSS from above -->
-    <style>
-        /* ===== BASE STYLES ===== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: "Poppins", sans-serif;
-            background: #fff9f5;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        input, button {
-            font-family: inherit;
-        }
-
-        /* ===== FORM CONTAINER ===== */
-        .form-container {
-            background: #fff;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .form-container h2 {
-            text-align: center;
-            color: #ff6f61;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .form-group input:focus {
-            border-color: #ff6f61;
-        }
-
-        .form-group small {
-            color: red;
-            display: none;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: #ff6f61;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background: #ff4c3b;
-        }
-
-        .toggle-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .toggle-link a {
-            color: #ff6f61;
-            font-weight: 500;
-        }
-    </style>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #fff9f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #ff6f61;
+      margin-bottom: 25px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 94%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+    .form-group input:focus {
+      border-color: #ff6f61;
+    }
+    .form-group small {
+      color: red;
+      display: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #ff6f61;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #ff4c3b;
+    }
+    .toggle-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .toggle-link a {
+      color: #ff6f61;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
   <div class="form-container">
@@ -136,8 +108,10 @@
 
   <script>
     const registerForm = document.getElementById('registerForm');
+
     registerForm.addEventListener('submit', function(e) {
       e.preventDefault();
+
       const name = document.getElementById('name');
       const email = document.getElementById('email');
       const password = document.getElementById('password');
@@ -145,6 +119,7 @@
 
       let valid = true;
 
+      // Name validation
       if(name.value.trim() === '') {
         name.nextElementSibling.style.display = 'block';
         valid = false;
@@ -152,6 +127,7 @@
         name.nextElementSibling.style.display = 'none';
       }
 
+      // Email validation
       if(!email.value.includes('@')) {
         email.nextElementSibling.style.display = 'block';
         valid = false;
@@ -159,6 +135,7 @@
         email.nextElementSibling.style.display = 'none';
       }
 
+      // Password validation
       if(password.value.length < 6) {
         password.nextElementSibling.style.display = 'block';
         valid = false;
@@ -166,6 +143,7 @@
         password.nextElementSibling.style.display = 'none';
       }
 
+      // Confirm password validation
       if(confirmPassword.value !== password.value || confirmPassword.value === '') {
         confirmPassword.nextElementSibling.style.display = 'block';
         valid = false;
@@ -173,11 +151,30 @@
         confirmPassword.nextElementSibling.style.display = 'none';
       }
 
-      if(valid) {
-        alert('Registration Successful!');
-        // Redirect to login page
-        // window.location.href = 'login.html';
+      if(!valid) return;
+
+      // Get existing users from localStorage
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      // Check if email already exists
+      const existingUser = users.find(u => u.email === email.value);
+      if(existingUser) {
+        alert('Email already registered! Please login.');
+        return;
       }
+
+      // Add new user
+      const newUser = {
+        name: name.value,
+        email: email.value,
+        password: password.value,
+        role: 'student' // default role
+      };
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+
+      alert('Registration successful! Redirecting to login...');
+      window.location.href = 'login.html';
     });
   </script>
 </body>

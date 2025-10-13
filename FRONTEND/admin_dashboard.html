@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | LearnHub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js" />
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      background: #fff9f5;
+      color: #333;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      padding: 15px 10%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .navbar h2 { margin: 0; }
+    .navbar button {
+      padding: 8px 18px;
+      background: #fff;
+      color: #ff6600;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .navbar button:hover {
+      background: #ff751a;
+      color: #fff;
+      border:1px solid #fff;
+    }
+
+    /* Dashboard container */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 30px;
+      padding: 40px 10%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      padding: 25px;
+      box-shadow: 0 8px 20px rgba(255, 102, 0, 0.15);
+    }
+    .sidebar h3 {
+      color: #ff6600;
+      margin-bottom: 20px;
+    }
+    .sidebar button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 12px;
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .sidebar button:hover {
+      background: #ff751a;
+      transform: translateY(-2px);
+    }
+
+    /* Main content */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(255,102,0,0.15);
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .card h4 {
+      color: #ff6600;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .card button {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: white;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .card button:hover {
+      background: #ff751a;
+      transform: translateY(-2px);
+    }
+
+    /* Charts section */
+    .chart-container {
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(255,102,0,0.15);
+    }
+
+    @media(max-width: 900px){
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <h2>LearnHub Admin Dashboard</h2>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="dashboard">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h3>Admin Controls</h3>
+      <button onclick="window.location.href='add_course.html'">Add New Course</button>
+      <button onclick="window.location.href='edit_course.html'">Edit Courses</button>
+      <button onclick="window.location.href='view_users.html'">View All Users</button>
+      <button onclick="window.location.href='view_courses.html'">View All Courses</button>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+
+      <!-- Stats cards -->
+      <div class="card-grid">
+        <div class="card">
+          <h4>Total Users</h4>
+          <p id="totalUsers">0</p>
+          <button onclick="window.location.href='view_users.html'">View Users</button>
+        </div>
+        <div class="card">
+          <h4>Total Courses</h4>
+          <p id="totalCourses">0</p>
+          <button onclick="window.location.href='view_courses.html'">View Courses</button>
+        </div>
+        <div class="card">
+          <h4>Active Enrollments</h4>
+          <p id="activeEnrollments">0</p>
+          <button onclick="window.location.href='view_courses.html'">View Enrollments</button>
+        </div>
+      </div>
+
+      <!-- Chart: Enrollments Over Time -->
+      <div class="chart-container">
+        <h4>Weekly Enrollment Trends</h4>
+        <canvas id="enrollChart" height="150"></canvas>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Mock data from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const courses = JSON.parse(localStorage.getItem('courses')) || [];
+    const enrollments = JSON.parse(localStorage.getItem('enrollments')) || [];
+
+    document.getElementById('totalUsers').textContent = users.length;
+    document.getElementById('totalCourses').textContent = courses.length;
+    document.getElementById('activeEnrollments').textContent = enrollments.length;
+
+    // Chart: Weekly enrollments
+    const ctx = document.getElementById('enrollChart').getContext('2d');
+    const labels = ["Week 1","Week 2","Week 3","Week 4","Week 5"];
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: 'Enrollments',
+        data: labels.map((_,i)=> Math.floor(Math.random()*20)+5), // mock weekly data
+        fill: true,
+        backgroundColor: 'rgba(255, 140, 0, 0.2)',
+        borderColor: 'rgba(255, 102, 0, 0.8)',
+        tension: 0.4
+      }]
+    };
+    new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero:true } }
+      }
+    });
+
+    // Logout function
+    function logout(){
+      sessionStorage.clear();
+      window.location.href="login.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Details | LearnHub</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(120deg, #fff5ee, #fff);
+      margin: 0;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 80px auto 50px;
+      padding: 0 20px;
+    }
+
+    h2 {
+      color: #ff6600;
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 400px;
+      border-radius: 12px;
+      border: none;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      margin-right: 15px;
+      margin-top: 10px;
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #ff751a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(255, 102, 0, 0.35);
+    }
+
+    .download-link {
+      display: block;
+      margin-top: 20px;
+      color: #ff6600;
+      font-weight: 500;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div id="navbar"></div>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("navbar").innerHTML = data);
+  </script>
+
+  <div class="container" id="courseContainer">
+    <!-- Course details injected here -->
+  </div>
+
+  <!-- Footer -->
+  <div id="footer"></div>
+  <script>
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("footer").innerHTML = data);
+
+    // Sample courses array (should match courses.html)
+    const courses = [
+      {
+        id: 1,
+        title: "Web Development",
+        description: "Learn HTML, CSS, JavaScript, and modern frameworks to build stunning websites.",
+        video: "https://www.youtube.com/embed/Ke90Tje7VS0",
+        notes: "/FRONTEND/Notes/web-development.pdf"
+      },
+      {
+        id: 2,
+        title: "Python Programming",
+        description: "Master Python from scratch and dive into real-world data science projects.",
+        video: "https://www.youtube.com/embed/_uQrJ0TkZlc",
+        notes: "/FRONTEND/Notes/python-programming.pdf"
+      },
+      {
+        id: 3,
+        title: "AI & Machine Learning",
+        description: "Understand AI algorithms and build smart models using real datasets.",
+        video: "https://www.youtube.com/embed/GwIo3gDZCVQ",
+        notes: "/FRONTEND/Notes/ai-ml.pdf"
+      },
+      {
+        id: 4,
+        title: "Data Analytics",
+        description: "Analyze data, uncover insights, and make data-driven business decisions.",
+        video: "https://www.youtube.com/embed/4HdZx05wEr4",
+        notes: "/FRONTEND/Notes/data-analytics.pdf"
+      }
+    ];
+
+    // Get course ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const courseId = parseInt(params.get('id'));
+
+    const course = courses.find(c => c.id === courseId);
+
+    const container = document.getElementById('courseContainer');
+
+    if(course){
+      container.innerHTML = `
+        <h2>${course.title}</h2>
+        <p>${course.description}</p>
+        <iframe src="${course.video}" allowfullscreen></iframe>
+        <a href="${course.notes}" class="download-link" download>Download Notes</a>
+        <button class="btn" id="enrollBtn">Enroll Now</button>
+        <a href="feedback.html" class="btn">Feedback</a>
+      `;
+
+      // Enroll button click
+      const enrollBtn = document.getElementById('enrollBtn');
+      enrollBtn.addEventListener('click', () => {
+        let enrolled = JSON.parse(localStorage.getItem('enrolledCourses')) || [];
+        if(!enrolled.includes(course.id)){
+          enrolled.push(course.id);
+          localStorage.setItem('enrolledCourses', JSON.stringify(enrolled));
+          alert("You have successfully enrolled in this course!");
+        } else {
+          alert("You are already enrolled in this course.");
+        }
+      });
+    } else {
+      container.innerHTML = "<p>Course not found.</p>";
+    }
+  </script>
+</body>
+</html>

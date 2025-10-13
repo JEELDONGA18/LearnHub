@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Course | LearnHub</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(120deg, #fff5ee, #fff);
+      margin: 0;
+      color: #333;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: white;
+      padding: 15px 10%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .navbar h2 { 
+        margin: 0; 
+        color: #fff;
+    }
+    .navbar button {
+      background: white;
+      color: #ff6600;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .navbar button:hover { background: #ffe0b3; }
+
+    /* Form container */
+    .container {
+      max-width: 600px;
+      margin: 70px auto;
+      padding: 25px 30px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(255, 102, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6600;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: "Poppins", sans-serif;
+    }
+
+    textarea { height: 120px; resize: none; }
+
+    button.submit-btn {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button.submit-btn:hover {
+      background: #ff751a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(255, 102, 0, 0.35);
+    }
+
+    .success {
+      color: green;
+      text-align: center;
+      margin-top: 15px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <h2>Edit Course</h2>
+    <button onclick="window.location.href='admin_dashboard.html'">Back to Dashboard</button>
+  </div>
+
+  <div class="container">
+    <h2>Edit Course Details</h2>
+    <form id="editCourseForm">
+      <label for="title">Course Title</label>
+      <input type="text" id="title" placeholder="Enter course title" required>
+
+      <label for="description">Description</label>
+      <textarea id="description" placeholder="Enter course description" required></textarea>
+
+      <label for="videoUrl">Video URL (YouTube)</label>
+      <input type="url" id="videoUrl" placeholder="Enter video URL" required>
+
+      <label for="imageUrl">Course Image URL</label>
+      <input type="url" id="imageUrl" placeholder="Enter image URL" required>
+
+      <label for="category">Category</label>
+      <select id="category" required>
+        <option value="">-- Select category --</option>
+        <option value="Web Development">Web Development</option>
+        <option value="Programming">Programming</option>
+        <option value="AI & ML">AI & ML</option>
+        <option value="Data Analytics">Data Analytics</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <button type="submit" class="submit-btn">Update Course</button>
+      <p class="success" id="successMsg"></p>
+    </form>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = parseInt(urlParams.get('id'));
+    const courses = JSON.parse(localStorage.getItem('courses')) || [];
+    const course = courses.find(c => c.id === courseId);
+
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const videoUrlInput = document.getElementById('videoUrl');
+    const imageUrlInput = document.getElementById('imageUrl');
+    const categoryInput = document.getElementById('category');
+    const successMsg = document.getElementById('successMsg');
+
+    // Preload course data
+    if(course){
+      titleInput.value = course.title;
+      descriptionInput.value = course.description;
+      videoUrlInput.value = course.videoUrl;
+      imageUrlInput.value = course.imageUrl;
+      categoryInput.value = course.category;
+    } else {
+      alert("Course not found!");
+      window.location.href = "admin_dashboard.html";
+    }
+
+    // Handle form submission
+    const editForm = document.getElementById('editCourseForm');
+    editForm.addEventListener('submit', function(e){
+      e.preventDefault();
+
+      course.title = titleInput.value.trim();
+      course.description = descriptionInput.value.trim();
+      course.videoUrl = videoUrlInput.value.trim();
+      course.imageUrl = imageUrlInput.value.trim();
+      course.category = categoryInput.value;
+
+      // Update localStorage
+      localStorage.setItem('courses', JSON.stringify(courses));
+
+      successMsg.textContent = "Course updated successfully!";
+
+      // Redirect after delay
+      setTimeout(() => {
+        window.location.href = "admin_dashboard.html";
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

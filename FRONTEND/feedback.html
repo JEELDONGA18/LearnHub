@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Feedback | LearnHub</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(120deg, #fff5ee, #fff);
+      margin: 0;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 30px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(255, 102, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff6600;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    select, textarea, input[type="number"] {
+      width: 96%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      font-family: "Poppins", sans-serif;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    button {
+      display: inline-block;
+      padding: 12px 25px;
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #ff751a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(255, 102, 0, 0.35);
+    }
+
+    .success {
+      color: green;
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div id="navbar"></div>
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("navbar").innerHTML = data);
+  </script>
+
+  <div class="container">
+    <h2>Submit Your Feedback</h2>
+    <form id="feedbackForm">
+      <label for="courseSelect">Select Course</label>
+      <select id="courseSelect" required>
+        <option value="">-- Choose a course --</option>
+      </select>
+
+      <label for="rating">Rating (1 to 5)</label>
+      <input type="number" id="rating" min="1" max="5" required>
+
+      <label for="feedbackText">Feedback</label>
+      <textarea id="feedbackText" rows="5" placeholder="Write your feedback..." required></textarea>
+
+      <button type="submit">Submit Feedback</button>
+      <p class="success" id="successMsg"></p>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer"></div>
+  <script>
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("footer").innerHTML = data);
+
+    // Sample courses (should match courses.html)
+    const courses = [
+      { id: 1, title: "Web Development" },
+      { id: 2, title: "Python Programming" },
+      { id: 3, title: "AI & Machine Learning" },
+      { id: 4, title: "Data Analytics" }
+    ];
+
+    const courseSelect = document.getElementById('courseSelect');
+    const enrolled = JSON.parse(localStorage.getItem('enrolledCourses')) || [];
+
+    // Populate dropdown with only enrolled courses
+    courses.forEach(course => {
+      if(enrolled.includes(course.id)) {
+        const option = document.createElement('option');
+        option.value = course.id;
+        option.textContent = course.title;
+        courseSelect.appendChild(option);
+      }
+    });
+
+    const feedbackForm = document.getElementById('feedbackForm');
+    const successMsg = document.getElementById('successMsg');
+
+    // Store previous page to redirect after submission
+    const previousPage = document.referrer.includes("course_detail.html") ? "course_detail.html?id=" + new URLSearchParams(window.location.search).get("id") : "student_dashboard.html";
+
+    feedbackForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      const courseId = parseInt(courseSelect.value);
+      const text = document.getElementById('feedbackText').value.trim();
+      const rating = parseInt(document.getElementById('rating').value);
+
+      if(!courseId || text === "" || !rating) return;
+
+      // Get existing feedback from localStorage
+      const allFeedback = JSON.parse(localStorage.getItem('feedback')) || [];
+
+      // Add new feedback
+      allFeedback.push({ courseId, text, rating, date: new Date().toLocaleString() });
+
+      localStorage.setItem('feedback', JSON.stringify(allFeedback));
+
+      successMsg.textContent = "Thank you! Your feedback has been submitted.";
+
+      // Reset form
+      feedbackForm.reset();
+
+      // Redirect after short delay
+      setTimeout(() => {
+        window.location.href = previousPage;
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

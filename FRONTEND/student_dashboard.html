@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard | LearnHub</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      background: #fff9f5;
+      color: #333;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      padding: 15px 10%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .navbar h2 { margin: 0; }
+    .navbar button {
+      padding: 8px 18px;
+      background: #fff;
+      color: #ff6600;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .navbar button:hover {
+      background: #ff751a;
+      color: #fff;
+    }
+
+    /* ===== DASHBOARD ===== */
+    .dashboard { padding: 40px 10%; }
+    
+    /* ===== PROFILE CARD ===== */
+    .profile-card {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.9);
+      padding: 25px 30px;
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(255,102,0,0.15);
+      margin-bottom: 40px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .profile-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ff6600;
+    }
+
+    .profile-info h3 { margin: 0 0 5px 0; color: #ff6600; }
+    .profile-info p { margin: 3px 0; font-weight: 500; }
+    .profile-stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      background: rgba(255,102,0,0.1);
+      padding: 12px 18px;
+      border-radius: 12px;
+      text-align: center;
+      min-width: 100px;
+    }
+    .stat h4 { margin: 0; color: #ff6600; }
+    .stat p { margin: 0; font-weight: 500; }
+
+    /* ===== PROGRESS CHART ===== */
+    .progress-section {
+      background: rgba(255,255,255,0.9);
+      padding: 25px 30px;
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(255,102,0,0.15);
+      margin-bottom: 40px;
+    }
+    .progress-section h3 { color: #ff6600; margin-bottom: 25px; }
+
+    /* ===== ENROLLED COURSES ===== */
+    .courses-section h3 { color: #ff6600; margin-bottom: 20px; }
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+    }
+    .course-card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(255,102,0,0.15);
+      transition: all 0.3s;
+      border: 1px solid rgba(255,102,0,0.1);
+    }
+    .course-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(255,102,0,0.3);
+    }
+    .course-card h4 { color: #ff6600; margin-bottom: 8px; }
+    .course-card p { margin-bottom: 10px; font-size: 0.95rem; }
+    .progress-bar {
+      background: #ff8c00;
+      height: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .course-card button {
+      background: linear-gradient(90deg, #ff8c00, #ff6600);
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .course-card button:hover { background: #ff751a; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width:768px){ .profile-card{flex-direction:column;align-items:flex-start;} .navbar{flex-direction:column;gap:10px;} }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h2>LearnHub Student Dashboard</h2>
+    <button id="logoutBtn">Logout</button>
+  </div>
+
+  <div class="dashboard">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <img src="/FRONTEND/Images/home/profile.jpg" alt="Profile Image" class="profile-img">
+      <div class="profile-info">
+        <h3 id="studentName">Student Name</h3>
+        <p id="studentEmail">student@example.com</p>
+      </div>
+      <div class="profile-stats">
+        <div class="stat">
+          <h4 id="coursesCount">0</h4>
+          <p>Enrolled</p>
+        </div>
+        <div class="stat">
+          <h4 id="completedCount">0</h4>
+          <p>Completed</p>
+        </div>
+        <div class="stat">
+          <h4 id="overallProgress">0%</h4>
+          <p>Progress</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Chart -->
+    <div class="progress-section">
+      <h3>Learning Progress Over Time</h3>
+      <canvas id="progressChart" height="120"></canvas>
+    </div>
+
+    <!-- Enrolled Courses -->
+    <div class="courses-section">
+      <h3>Your Courses</h3>
+      <div class="course-grid" id="enrolledCourses"></div>
+    </div>
+  </div>
+
+  <script>
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+    });
+
+    // Sample student and courses
+    const student = JSON.parse(sessionStorage.getItem('student')) || { name: "John Doe", email: "john@example.com" };
+    const enrolledCourses = JSON.parse(localStorage.getItem('enrolledCourses')) || [1,2,3];
+    const courses = [
+      {id:1,title:"Web Development",description:"Learn HTML, CSS, JS",progress:75, history:[10,20,40,60,75]},
+      {id:2,title:"Python Programming",description:"Master Python",progress:50, history:[5,15,25,35,50]},
+      {id:3,title:"AI & ML",description:"Build AI models",progress:30, history:[5,10,15,20,30]},
+      {id:4,title:"Data Analytics",description:"Analyze data",progress:0, history:[0,0,0,0,0]}
+    ];
+
+    // Set profile info
+    document.getElementById('studentName').textContent = student.name;
+    document.getElementById('studentEmail').textContent = student.email;
+    document.getElementById('coursesCount').textContent = enrolledCourses.length;
+
+    // Calculate completed courses
+    let completed = 0;
+    enrolledCourses.forEach(id => { if(courses.find(c=>c.id===id).progress>=100) completed++; });
+    document.getElementById('completedCount').textContent = completed;
+
+    // Overall progress
+    let totalProgress = 0;
+    enrolledCourses.forEach(id => { totalProgress += courses.find(c=>c.id===id).progress; });
+    const overall = enrolledCourses.length ? Math.round(totalProgress/enrolledCourses.length) : 0;
+    document.getElementById('overallProgress').textContent = overall + "%";
+
+    // Populate enrolled courses
+    const container = document.getElementById('enrolledCourses');
+    enrolledCourses.forEach(id => {
+      const c = courses.find(course=>course.id===id);
+      const card = document.createElement('div');
+      card.classList.add('course-card');
+      card.innerHTML = `
+        <h4>${c.title}</h4>
+        <p>${c.description}</p>
+        <div class="progress-bar" style="width:${c.progress}%"></div>
+        <p><strong>${c.progress}% Completed</strong></p>
+        <button onclick="viewCourse(${c.id})">View Course</button>
+      `;
+      container.appendChild(card);
+    });
+    function viewCourse(id){ window.location.href = `course_detail.html?id=${id}`; }
+
+    // Chart.js - Line chart for progress over time
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const labels = ["Week 1","Week 2","Week 3","Week 4","Week 5"];
+    const datasets = enrolledCourses.map(id=>{
+      const c = courses.find(course=>course.id===id);
+      return {
+        label: c.title,
+        data: c.history,
+        fill:false,
+        borderColor: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*150)},0,0.8)`,
+        tension:0.4
+      };
+    });
+    new Chart(ctx,{type:'line',data:{labels, datasets}, options:{responsive:true, plugins:{legend:{position:'top'}}}});
+  </script>
+</body>
+</html>

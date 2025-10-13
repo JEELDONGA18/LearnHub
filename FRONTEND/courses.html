@@ -94,6 +94,8 @@
       transition: all 0.4s ease;
       transform: translateY(0);
       border: 1px solid rgba(255, 102, 0, 0.1);
+      display: flex;
+      flex-direction: column;
     }
 
     .course-card:hover {
@@ -115,6 +117,9 @@
     .course-info {
       padding: 20px 22px 25px;
       text-align: left;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .course-info h4 {
@@ -128,6 +133,7 @@
       color: #555;
       line-height: 1.6;
       margin-bottom: 18px;
+      flex: 1;
     }
 
     .enroll-btn {
@@ -141,6 +147,7 @@
       letter-spacing: 0.5px;
       transition: all 0.3s;
       box-shadow: 0 4px 8px rgba(255, 102, 0, 0.25);
+      text-align: center;
     }
 
     .enroll-btn:hover {
@@ -179,44 +186,10 @@
   </section>
 
   <!-- Courses Section -->
-  <section class="courses" id="courses">
+  <section class="courses">
     <h3>Our Featured Courses</h3>
-    <div class="course-grid">
-      <div class="course-card">
-        <img src="/FRONTEND/Images/home/full-stack-web-development.jpg" alt="Web Development">
-        <div class="course-info">
-          <h4>Web Development</h4>
-          <p>Learn HTML, CSS, JavaScript, and modern frameworks to build stunning websites.</p>
-          <a href="#" class="enroll-btn">Enroll Now</a>
-        </div>
-      </div>
-
-      <div class="course-card">
-        <img src="/FRONTEND/Images/home/Python-Programming-For-Beginners.jpg" alt="Python Programming">
-        <div class="course-info">
-          <h4>Python Programming</h4>
-          <p>Master Python from scratch and dive into real-world data science projects.</p>
-          <a href="#" class="enroll-btn">Enroll Now</a>
-        </div>
-      </div>
-
-      <div class="course-card">
-        <img src="/FRONTEND/Images/home/machine-learning.jpeg" alt="AI & ML">
-        <div class="course-info">
-          <h4>AI & Machine Learning</h4>
-          <p>Understand AI algorithms and build smart models using real datasets.</p>
-          <a href="#" class="enroll-btn">Enroll Now</a>
-        </div>
-      </div>
-
-      <div class="course-card">
-        <img src="https://cdn.pixabay.com/photo/2016/11/19/14/00/analysis-1839406_1280.jpg" alt="Data Analytics">
-        <div class="course-info">
-          <h4>Data Analytics</h4>
-          <p>Analyze data, uncover insights, and make data-driven business decisions.</p>
-          <a href="#" class="enroll-btn">Enroll Now</a>
-        </div>
-      </div>
+    <div class="course-grid" id="courseGrid">
+      <!-- JS injected courses -->
     </div>
   </section>
 
@@ -226,6 +199,53 @@
     fetch("footer.html")
       .then(res => res.text())
       .then(data => document.getElementById("footer").innerHTML = data);
+
+    // Sample courses array
+    const courses = [
+      {
+        id: 1,
+        title: "Web Development",
+        description: "Learn HTML, CSS, JavaScript, and modern frameworks to build stunning websites.",
+        instructor: "John Doe",
+        image: "/FRONTEND/Images/home/full-stack-web-development.jpg"
+      },
+      {
+        id: 2,
+        title: "Python Programming",
+        description: "Master Python from scratch and dive into real-world data science projects.",
+        instructor: "Jane Smith",
+        image: "/FRONTEND/Images/home/Python-Programming-For-Beginners.jpg"
+      },
+      {
+        id: 3,
+        title: "AI & Machine Learning",
+        description: "Understand AI algorithms and build smart models using real datasets.",
+        instructor: "Alice Johnson",
+        image: "/FRONTEND/Images/home/machine-learning.jpeg"
+      },
+      {
+        id: 4,
+        title: "Data Science",
+        description: "Analyze data, uncover insights, and make data-driven business decisions.",
+        instructor: "Bob Brown",
+        image: "/FRONTEND/Images/home/data-science.jpg"
+      }
+    ];
+
+    const courseGrid = document.getElementById("courseGrid");
+    courses.forEach(course => {
+      const card = document.createElement("div");
+      card.className = "course-card";
+      card.innerHTML = `
+        <img src="${course.image}" alt="${course.title}">
+        <div class="course-info">
+          <h4>${course.title}</h4>
+          <p>${course.description}</p>
+          <a href="course_detail.html?id=${course.id}" class="enroll-btn">View Details</a>
+        </div>
+      `;
+      courseGrid.appendChild(card);
+    });
   </script>
 </body>
 </html>

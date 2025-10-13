@@ -4,104 +4,76 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login | LearnHub</title>
-  <!-- Include CSS from above -->
-    <style>
-        /* ===== BASE STYLES ===== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: "Poppins", sans-serif;
-            background: #fff9f5;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        input, button {
-            font-family: inherit;
-        }
-
-        /* ===== FORM CONTAINER ===== */
-        .form-container {
-            background: #fff;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .form-container h2 {
-            text-align: center;
-            color: #ff6f61;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .form-group input:focus {
-            border-color: #ff6f61;
-        }
-
-        .form-group small {
-            color: red;
-            display: none;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: #ff6f61;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background: #ff4c3b;
-        }
-
-        .toggle-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .toggle-link a {
-            color: #ff6f61;
-            font-weight: 500;
-        }
-    </style>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #fff9f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #ff6f61;
+      margin-bottom: 25px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 94%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+    .form-group input:focus {
+      border-color: #ff6f61;
+    }
+    .form-group small {
+      color: red;
+      display: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #ff6f61;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #ff4c3b;
+    }
+    .toggle-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .toggle-link a {
+      color: #ff6f61;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
   <div class="form-container">
@@ -110,12 +82,12 @@
       <div class="form-group">
         <label for="email">Email</label>
         <input type="email" id="email" placeholder="Enter your email" required>
-        <small>Email is required</small>
+        <small>Valid email required</small>
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-        <small>Password is required (min 6 chars)</small>
+        <input type="password" id="password" placeholder="Enter password" required>
+        <small>Password must be at least 6 characters</small>
       </div>
       <button type="submit" class="btn">Login</button>
       <div class="toggle-link">
@@ -126,12 +98,21 @@
 
   <script>
     const loginForm = document.getElementById('loginForm');
+
+    // Example users (in real app, use backend authentication)
+    const users = [
+      { email: "admin@example.com", password: "admin123", role: "admin" },
+      { email: "student@example.com", password: "student123", role: "student" }
+    ];
+
     loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
+
       const email = document.getElementById('email');
       const password = document.getElementById('password');
       let valid = true;
 
+      // Basic validation
       if(!email.value.includes('@')) {
         email.nextElementSibling.style.display = 'block';
         valid = false;
@@ -146,10 +127,25 @@
         password.nextElementSibling.style.display = 'none';
       }
 
-      if(valid) {
-        alert('Login Successful!');
-        // Redirect to homepage or dashboard
-        // window.location.href = 'index.html';
+      if(!valid) return;
+
+      // Check login
+      const user = users.find(u => u.email === email.value && u.password === password.value);
+
+      if(user) {
+        // Store login state
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('userRole', user.role);
+        localStorage.setItem('userEmail', user.email);
+
+        // Redirect based on role
+        if(user.role === 'admin') {
+          window.location.href = 'admin_dashboard.html';
+        } else {
+          window.location.href = 'student_dashboard.html';
+        }
+      } else {
+        alert('Invalid email or password!');
       }
     });
   </script>
