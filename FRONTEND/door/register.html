@@ -110,72 +110,70 @@
     const registerForm = document.getElementById('registerForm');
 
     registerForm.addEventListener('submit', function(e) {
-      e.preventDefault();
+        e.preventDefault();
 
-      const name = document.getElementById('name');
-      const email = document.getElementById('email');
-      const password = document.getElementById('password');
-      const confirmPassword = document.getElementById('confirmPassword');
+        const name = document.getElementById('name');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
 
-      let valid = true;
+        let valid = true;
 
-      // Name validation
-      if(name.value.trim() === '') {
-        name.nextElementSibling.style.display = 'block';
-        valid = false;
-      } else {
-        name.nextElementSibling.style.display = 'none';
-      }
+        // Name validation
+        if(name.value.trim() === '') {
+            name.nextElementSibling.style.display = 'block';
+            valid = false;
+        } else {
+            name.nextElementSibling.style.display = 'none';
+        }
 
-      // Email validation
-      if(!email.value.includes('@')) {
-        email.nextElementSibling.style.display = 'block';
-        valid = false;
-      } else {
-        email.nextElementSibling.style.display = 'none';
-      }
+        // Email validation
+        if(!email.value.includes('@')) {
+            email.nextElementSibling.style.display = 'block';
+            valid = false;
+        } else {
+            email.nextElementSibling.style.display = 'none';
+        }
 
-      // Password validation
-      if(password.value.length < 6) {
-        password.nextElementSibling.style.display = 'block';
-        valid = false;
-      } else {
-        password.nextElementSibling.style.display = 'none';
-      }
+        // Password validation
+        if(password.value.length < 6) {
+            password.nextElementSibling.style.display = 'block';
+            valid = false;
+        } else {
+            password.nextElementSibling.style.display = 'none';
+        }
 
-      // Confirm password validation
-      if(confirmPassword.value !== password.value || confirmPassword.value === '') {
-        confirmPassword.nextElementSibling.style.display = 'block';
-        valid = false;
-      } else {
-        confirmPassword.nextElementSibling.style.display = 'none';
-      }
+        // Confirm password validation
+        if(confirmPassword.value !== password.value || confirmPassword.value === '') {
+            confirmPassword.nextElementSibling.style.display = 'block';
+            valid = false;
+        } else {
+            confirmPassword.nextElementSibling.style.display = 'none';
+        }
 
-      if(!valid) return;
+        if(!valid) return;
 
-      // Get existing users from localStorage
-      const users = JSON.parse(localStorage.getItem('users')) || [];
+        // ✅ Prepare data for PHP backend
+        const formData = new FormData();
+        formData.append('name', name.value);
+        formData.append('email', email.value);
+        formData.append('password', password.value);
+        formData.append('confirm_password', confirmPassword.value);
 
-      // Check if email already exists
-      const existingUser = users.find(u => u.email === email.value);
-      if(existingUser) {
-        alert('Email already registered! Please login.');
-        return;
-      }
-
-      // Add new user
-      const newUser = {
-        name: name.value,
-        email: email.value,
-        password: password.value,
-        role: 'student' // default role
-      };
-      users.push(newUser);
-      localStorage.setItem('users', JSON.stringify(users));
-
-      alert('Registration successful! Redirecting to login...');
-      window.location.href = 'login.html';
+        // ✅ Send to register.php
+        fetch('/BACKEND/register.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            if(data.status === 'success'){
+                window.location.href = 'login.html';
+            }
+        })
+        .catch(err => console.error('Error:', err));
     });
-  </script>
+    </script>
 </body>
 </html>

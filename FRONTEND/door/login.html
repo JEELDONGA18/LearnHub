@@ -97,15 +97,9 @@
   </div>
 
   <script>
-    const loginForm = document.getElementById('loginForm');
+  const loginForm = document.getElementById('loginForm');
 
-    // Example users (in real app, use backend authentication)
-    const users = [
-      { email: "admin@example.com", password: "admin123", role: "admin" },
-      { email: "student@example.com", password: "student123", role: "student" }
-    ];
-
-    loginForm.addEventListener('submit', function(e) {
+  loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
       const email = document.getElementById('email');
@@ -114,40 +108,45 @@
 
       // Basic validation
       if(!email.value.includes('@')) {
-        email.nextElementSibling.style.display = 'block';
-        valid = false;
+          email.nextElementSibling.style.display = 'block';
+          valid = false;
       } else {
-        email.nextElementSibling.style.display = 'none';
+          email.nextElementSibling.style.display = 'none';
       }
 
       if(password.value.length < 6) {
-        password.nextElementSibling.style.display = 'block';
-        valid = false;
+          password.nextElementSibling.style.display = 'block';
+          valid = false;
       } else {
-        password.nextElementSibling.style.display = 'none';
+          password.nextElementSibling.style.display = 'none';
       }
 
       if(!valid) return;
 
-      // Check login
-      const user = users.find(u => u.email === email.value && u.password === password.value);
+      // Send login request to PHP
+      const formData = new FormData();
+      formData.append('email', email.value);
+      formData.append('password', password.value);
 
-      if(user) {
-        // Store login state
-        localStorage.setItem('loggedIn', 'true');
-        localStorage.setItem('userRole', user.role);
-        localStorage.setItem('userEmail', user.email);
-
-        // Redirect based on role
-        if(user.role === 'admin') {
-          window.location.href = 'admin_dashboard.html';
-        } else {
-          window.location.href = 'student_dashboard.html';
-        }
-      } else {
-        alert('Invalid email or password!');
-      }
-    });
+      fetch('/BACKEND/login.php', {
+          method: 'POST',
+          body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+          if(data.status === 'success'){
+              // Redirect based on role
+              if(data.role === 'admin'){
+                  window.location.href = 'admin_dashboard.html';
+              } else {
+                  window.location.href = 'student_dashboard.html';
+              }
+          } else {
+              alert(data.message);
+          }
+      })
+      .catch(err => console.error('Error:', err));
+  });
   </script>
 </body>
 </html>

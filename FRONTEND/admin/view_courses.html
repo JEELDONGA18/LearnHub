@@ -114,49 +114,70 @@
   <h2>Manage Courses</h2>
 </div>
 
-<script>
+  <script>
   const coursesContainer = document.getElementById('coursesContainer');
-  let courses = JSON.parse(localStorage.getItem('courses')) || [];
 
-  function renderCourses() {
-    coursesContainer.innerHTML = '<h2>Manage Courses</h2>';
-    if(courses.length === 0){
-      coursesContainer.innerHTML += '<p>No courses found. Please add courses.</p>';
-      return;
-    }
+  async function fetchCourses() {
+      const res = await fetch('/BACKEND/fetch_courses.php');
+      const data = await res.json();
+      if(data.status === 'success'){
+          renderCourses(data.courses);
+      } else {
+          coursesContainer.innerHTML = `<p>${data.message}</p>`;
+      }
+  }
 
-    courses.forEach(course => {
-      const card = document.createElement('div');
-      card.className = 'course-card';
-      card.innerHTML = `
-        <img src="${course.imageUrl}" alt="${course.title}">
-        <div class="course-info">
-          <h4>${course.title}</h4>
-          <p>${course.description.substring(0,60)}...</p>
-          <p>Category: ${course.category}</p>
-        </div>
-        <div class="actions">
-          <button class="edit" onclick="editCourse(${course.id})">Edit</button>
-          <button class="delete" onclick="deleteCourse(${course.id})">Delete</button>
-        </div>
-      `;
-      coursesContainer.appendChild(card);
-    });
+  function renderCourses(courses) {
+      coursesContainer.innerHTML = '<h2>Manage Courses</h2>';
+
+      if(courses.length === 0){
+          coursesContainer.innerHTML += '<p>No courses found. Please add courses.</p>';
+          return;
+      }
+
+      courses.forEach(course => {
+          const card = document.createElement('div');
+          card.className = 'course-card';
+          card.innerHTML = `
+              <img src="${course.image_url}" alt="${course.title}">
+              <div class="course-info">
+                  <h4>${course.title}</h4>
+                  <p>${course.description.substring(0,60)}...</p>
+                  <p>Category: ${course.category}</p>
+              </div>
+              <div class="actions">
+                  <button class="edit" onclick="editCourse(${course.course_id})">Edit</button>
+                  <button class="delete" onclick="deleteCourse(${course.course_id})">Delete</button>
+              </div>
+          `;
+          coursesContainer.appendChild(card);
+      });
   }
 
   function editCourse(id) {
-    window.location.href = `edit_course.html?id=${id}`;
+      window.location.href = `edit_course.html?id=${id}`;
   }
 
-  function deleteCourse(id) {
-    if(confirm('Are you sure you want to delete this course?')){
-      courses = courses.filter(c => c.id !== id);
-      localStorage.setItem('courses', JSON.stringify(courses));
-      renderCourses();
-    }
+  async function deleteCourse(id) {
+      if(!confirm('Are you sure you want to delete this course?')) return;
+
+      const formData = new FormData();
+      formData.append('course_id', id);
+
+      const res = await fetch('/BACKEND/delete_course.php', {
+          method: 'POST',
+          body: formData
+      });
+      const data = await res.json();
+
+      alert(data.message);
+      if(data.status === 'success'){
+          fetchCourses(); // refresh courses
+      }
   }
 
-  renderCourses();
-</script>
+  // Initial fetch
+  fetchCourses();
+  </script>
 </body>
 </html>
