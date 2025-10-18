@@ -4,7 +4,7 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
 // Include database config
-include 'config.php';
+include '../config.php';
 
 // Check if course_id is provided
 if (isset($_GET['id'])) {

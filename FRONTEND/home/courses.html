@@ -196,56 +196,44 @@
   <!-- Footer -->
   <div id="footer"></div>
   <script>
-    fetch("footer.html")
-      .then(res => res.text())
-      .then(data => document.getElementById("footer").innerHTML = data);
+const courseGrid = document.getElementById("courseGrid");
 
-    // Sample courses array
-    const courses = [
-      {
-        id: 1,
-        title: "Web Development",
-        description: "Learn HTML, CSS, JavaScript, and modern frameworks to build stunning websites.",
-        instructor: "John Doe",
-        image: "/FRONTEND/Images/full-stack-web-development.jpg"
-      },
-      {
-        id: 2,
-        title: "Python Programming",
-        description: "Master Python from scratch and dive into real-world data science projects.",
-        instructor: "Jane Smith",
-        image: "/FRONTEND/Images/Python-Programming-For-Beginners.jpg"
-      },
-      {
-        id: 3,
-        title: "AI & Machine Learning",
-        description: "Understand AI algorithms and build smart models using real datasets.",
-        instructor: "Alice Johnson",
-        image: "/FRONTEND/Images/machine-learning.jpeg"
-      },
-      {
-        id: 4,
-        title: "Data Science",
-        description: "Analyze data, uncover insights, and make data-driven business decisions.",
-        instructor: "Bob Brown",
-        image: "/FRONTEND/Images/data-science.jpg"
-      }
-    ];
+// Fetch courses from backend
+async function loadCourses() {
+  try {
+    const res = await fetch('../../BACKEND/fetch_courses.php'); // adjust path
+    const data = await res.json();
 
-    const courseGrid = document.getElementById("courseGrid");
-    courses.forEach(course => {
-      const card = document.createElement("div");
-      card.className = "course-card";
-      card.innerHTML = `
-        <img src="${course.image}" alt="${course.title}">
-        <div class="course-info">
-          <h4>${course.title}</h4>
-          <p>${course.description}</p>
-          <a href="course_detail.html?id=${course.id}" class="enroll-btn">View Details</a>
-        </div>
-      `;
-      courseGrid.appendChild(card);
-    });
-  </script>
+    if(data.status === 'success'){
+      renderCourses(data.courses);
+    } else {
+      courseGrid.innerHTML = <p>No courses found.</p>;
+    }
+  } catch(err) {
+    console.error("Error fetching courses:", err);
+    courseGrid.innerHTML = <p>Failed to load courses.</p>;
+  }
+}
+
+function renderCourses(courses) {
+  courseGrid.innerHTML = '';
+  courses.forEach(course => {
+    const card = document.createElement("div");
+    card.className = "course-card";
+    card.innerHTML = `
+      <img src="${course.image_url}" alt="${course.title}">
+      <div class="course-info">
+        <h4>${course.title}</h4>
+        <p>${course.description}</p>
+        <a href="course_detail.html?id=${course.course_id}" class="enroll-btn">View Details</a>
+      </div>
+    `;
+    courseGrid.appendChild(card);
+  });
+}
+
+// Load courses on page load
+loadCourses();
+</script>
 </body>
 </html>

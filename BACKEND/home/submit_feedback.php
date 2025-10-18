@@ -3,7 +3,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-include 'config.php';
+include '../config.php';
 
 // Get POST data from frontend
 $data = json_decode(file_get_contents("php://input"), true);

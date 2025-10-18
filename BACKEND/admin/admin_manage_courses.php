@@ -1,6 +1,6 @@
 <?php
 // admin_manage_courses.php
-include 'config.php';
+include '../config.php';
 header('Content-Type: application/json');
 
 $action = $_GET['action'] ?? '';

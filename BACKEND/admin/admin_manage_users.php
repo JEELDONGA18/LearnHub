@@ -1,11 +1,15 @@
 <?php
 // admin_manage_users.php
-include 'config.php';
+include '../config.php';
 header('Content-Type: application/json');
 session_start();
 
 // Only admin can access
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+// if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+//     echo json_encode(['status' => 'error', 'message' => 'Access denied']);
+//     exit;
+// }
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     echo json_encode(['status' => 'error', 'message' => 'Access denied']);
     exit;
 }

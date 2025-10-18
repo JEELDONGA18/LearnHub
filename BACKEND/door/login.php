@@ -3,7 +3,7 @@
 
 session_start();
 header('Content-Type: application/json'); // JSON response
-include "config.php";
+include "../config.php";
 
 // Get POST data
 $email = trim($_POST['email'] ?? '');

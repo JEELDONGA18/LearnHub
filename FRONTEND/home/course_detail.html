@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -68,6 +69,7 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <div id="navbar"></div>
@@ -89,70 +91,55 @@
       .then(data => document.getElementById("footer").innerHTML = data);
 
     // Sample courses array (should match courses.html)
-    const courses = [
-      {
-        id: 1,
-        title: "Web Development",
-        description: "Learn HTML, CSS, JavaScript, and modern frameworks to build stunning websites.",
-        video: "https://www.youtube.com/embed/Ke90Tje7VS0",
-        notes: "/FRONTEND/Notes/web-development.pdf"
-      },
-      {
-        id: 2,
-        title: "Python Programming",
-        description: "Master Python from scratch and dive into real-world data science projects.",
-        video: "https://www.youtube.com/embed/_uQrJ0TkZlc",
-        notes: "/FRONTEND/Notes/python-programming.pdf"
-      },
-      {
-        id: 3,
-        title: "AI & Machine Learning",
-        description: "Understand AI algorithms and build smart models using real datasets.",
-        video: "https://www.youtube.com/embed/GwIo3gDZCVQ",
-        notes: "/FRONTEND/Notes/ai-ml.pdf"
-      },
-      {
-        id: 4,
-        title: "Data Analytics",
-        description: "Analyze data, uncover insights, and make data-driven business decisions.",
-        video: "https://www.youtube.com/embed/4HdZx05wEr4",
-        notes: "/FRONTEND/Notes/data-analytics.pdf"
-      }
-    ];
-
-    // Get course ID from URL
-    const params = new URLSearchParams(window.location.search);
-    const courseId = parseInt(params.get('id'));
-
-    const course = courses.find(c => c.id === courseId);
 
     const container = document.getElementById('courseContainer');
+    const params = new URLSearchParams(window.location.search);
+    const courseId = params.get('id');
 
-    if(course){
-      container.innerHTML = `
-        <h2>${course.title}</h2>
-        <p>${course.description}</p>
-        <iframe src="${course.video}" allowfullscreen></iframe>
-        <a href="${course.notes}" class="download-link" download>Download Notes</a>
-        <button class="btn" id="enrollBtn">Enroll Now</button>
-        <a href="feedback.html" class="btn">Feedback</a>
-      `;
+    async function loadCourse() {
+      try {
+        const res = await fetch('../../BACKEND/home/course_detail.php?id=${courseId}');
+        // const res = await fetch(../../BACKEND/course_detail.php?id=${courseId});
+        const data = await res.json();
 
-      // Enroll button click
-      const enrollBtn = document.getElementById('enrollBtn');
-      enrollBtn.addEventListener('click', () => {
-        let enrolled = JSON.parse(localStorage.getItem('enrolledCourses')) || [];
-        if(!enrolled.includes(course.id)){
-          enrolled.push(course.id);
-          localStorage.setItem('enrolledCourses', JSON.stringify(enrolled));
-          alert("You have successfully enrolled in this course!");
+        if (data.status === 'success') {
+          const course = data.course;
+          container.innerHTML = `
+                <h2>${course.title}</h2>
+                <p>${course.description}</p>
+                <iframe src="${course.video_url}" allowfullscreen></iframe>
+                <a href="${course.notes_url}" class="download-link" download>Download Notes</a>
+                <button class="btn" id="enrollBtn">Enroll Now</button>
+                <a href="feedback.html?course_id=${course.course_id}" class="btn">Feedback</a>
+            `;
+
+          const enrollBtn = document.getElementById('enrollBtn');
+          enrollBtn.addEventListener('click', async () => {
+            // Call enroll_course.php to enroll dynamically
+            const formData = new FormData();
+            formData.append('course_id', course.course_id);
+
+            const res = await fetch('../../BACKEND/student/enroll_course.php', {
+              method: 'POST',
+              body: formData
+            });
+            const result = await res.json();
+            alert(result.message);
+          });
+
         } else {
-          alert("You are already enrolled in this course.");
+          container.innerHTML = <p>${data.message}</p>;
         }
-      });
-    } else {
-      container.innerHTML = "<p>Course not found.</p>";
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = <p>Failed to load course details.</p>;
+      }
     }
+
+    loadCourse();
+
   </script>
 </body>
+
 </html>

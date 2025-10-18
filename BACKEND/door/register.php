@@ -2,7 +2,7 @@
 // register.php - Handles user registration
 
 header('Content-Type: application/json'); // Return JSON response
-include "config.php"; // Database connection
+include "../config.php"; // Database connection
 
 // Get POST data
 $name = trim($_POST['name'] ?? '');

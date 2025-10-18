@@ -136,47 +136,56 @@
     </form>
   </div>
 
-  <script>
+<script>
     const courseForm = document.getElementById('courseForm');
     const successMsg = document.getElementById('successMsg');
+    const errorMsg = document.getElementById('errorMsg');
 
     courseForm.addEventListener('submit', function(e){
       e.preventDefault();
 
+      successMsg.textContent = '';
+      errorMsg.textContent = '';
+
       const title = document.getElementById('title').value.trim();
       const description = document.getElementById('description').value.trim();
-      const videoUrl = document.getElementById('videoUrl').value.trim();
-      const imageUrl = document.getElementById('imageUrl').value.trim();
+      const video_url = document.getElementById('videoUrl').value.trim();
+      const image_url = document.getElementById('imageUrl').value.trim();
       const category = document.getElementById('category').value;
 
-      if(!title || !description || !videoUrl || !imageUrl || !category) return;
+      if(!title || !description || !video_url || !image_url || !category) return;
 
-      // Get courses from localStorage
-      const courses = JSON.parse(localStorage.getItem('courses')) || [];
-
-      // Create new course object
-      const newCourse = {
-        id: Date.now(),
+      // Prepare payload
+      const payload = {
         title,
         description,
-        videoUrl,
-        imageUrl,
+        video_url,
+        image_url,
         category
       };
 
-      // Save to localStorage
-      courses.push(newCourse);
-      localStorage.setItem('courses', JSON.stringify(courses));
-
-      successMsg.textContent = "Course added successfully!";
-
-      // Reset form
-      courseForm.reset();
-
-      // Optionally, redirect after short delay
-      setTimeout(()=> {
-        window.location.href = "admin_dashboard.html";
-      }, 1500);
+      fetch('../../BACKEND/admin/admin_manage_courses.php?action=add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'success'){
+          successMsg.textContent = data.message;
+          courseForm.reset();
+          // Optional redirect
+          setTimeout(()=> {
+            window.location.href = 'admin_dashboard.html';
+          }, 1500);
+        } else {
+          errorMsg.textContent = data.message;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        errorMsg.textContent = 'Something went wrong. Try again.';
+      });
     });
   </script>
 </body>
