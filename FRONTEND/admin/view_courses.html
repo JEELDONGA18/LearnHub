@@ -114,70 +114,69 @@
   <h2>Manage Courses</h2>
 </div>
 
-  <script>
-  const coursesContainer = document.getElementById('coursesContainer');
+<script>
+const coursesContainer = document.getElementById('coursesContainer');
 
-  async function fetchCourses() {
-      const res = await fetch('/BACKEND/fetch_courses.php');
-      const data = await res.json();
-      if(data.status === 'success'){
-          renderCourses(data.courses);
-      } else {
-          coursesContainer.innerHTML = `<p>${data.message}</p>`;
-      }
-  }
+// Fetch all courses
+async function fetchCourses() {
+    const res = await fetch('../../BACKEND/admin/admin_manage_courses.php?action=fetch');
+    const data = await res.json();
 
-  function renderCourses(courses) {
-      coursesContainer.innerHTML = '<h2>Manage Courses</h2>';
+    if (data.status === 'success') {
+        renderCourses(data.data);
+    } else {
+        coursesContainer.innerHTML = `<p>${data.message}</p>`;
+    }
+}
 
-      if(courses.length === 0){
-          coursesContainer.innerHTML += '<p>No courses found. Please add courses.</p>';
-          return;
-      }
+function renderCourses(courses) {
+    coursesContainer.innerHTML = '<h2>Manage Courses</h2>';
 
-      courses.forEach(course => {
-          const card = document.createElement('div');
-          card.className = 'course-card';
-          card.innerHTML = `
-              <img src="${course.image_url}" alt="${course.title}">
-              <div class="course-info">
-                  <h4>${course.title}</h4>
-                  <p>${course.description.substring(0,60)}...</p>
-                  <p>Category: ${course.category}</p>
-              </div>
-              <div class="actions">
-                  <button class="edit" onclick="editCourse(${course.course_id})">Edit</button>
-                  <button class="delete" onclick="deleteCourse(${course.course_id})">Delete</button>
-              </div>
-          `;
-          coursesContainer.appendChild(card);
-      });
-  }
+    if (courses.length === 0) {
+        coursesContainer.innerHTML += '<p>No courses found. Please add courses.</p>';
+        return;
+    }
 
-  function editCourse(id) {
-      window.location.href = `edit_course.html?id=${id}`;
-  }
+    courses.forEach(course => {
+        const card = document.createElement('div');
+        card.className = 'course-card';
+        card.innerHTML = `
+            <img src="${course.image_url}" alt="${course.title}">
+            <div class="course-info">
+                <h4>${course.title}</h4>
+                <p>${course.description.substring(0,60)}...</p>
+                <p>Category: ${course.category}</p>
+            </div>
+            <div class="actions">
+                <button class="edit" onclick="editCourse(${course.course_id})">Edit</button>
+                <button class="delete" onclick="deleteCourse(${course.course_id})">Delete</button>
+            </div>
+        `;
+        coursesContainer.appendChild(card);
+    });
+}
 
-  async function deleteCourse(id) {
-      if(!confirm('Are you sure you want to delete this course?')) return;
+function editCourse(id) {
+    window.location.href = `edit_course.html?id=${id}`;
+}
 
-      const formData = new FormData();
-      formData.append('course_id', id);
+// Delete course using unified PHP
+async function deleteCourse(id) {
+    if(!confirm('Are you sure you want to delete this course?')) return;
 
-      const res = await fetch('/BACKEND/delete_course.php', {
-          method: 'POST',
-          body: formData
-      });
-      const data = await res.json();
+    const res = await fetch('../../BACKEND/admin/admin_manage_courses.php?action=delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({course_id: id})
+    });
 
-      alert(data.message);
-      if(data.status === 'success'){
-          fetchCourses(); // refresh courses
-      }
-  }
+    const data = await res.json();
+    alert(data.message);
+    if (data.status === 'success') fetchCourses(); // refresh
+}
 
-  // Initial fetch
-  fetchCourses();
-  </script>
+// Initial fetch
+fetchCourses();
+</script>
 </body>
 </html>

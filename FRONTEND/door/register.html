@@ -161,7 +161,7 @@
         formData.append('confirm_password', confirmPassword.value);
 
         // ✅ Send to register.php
-        fetch('/BACKEND/register.php', {
+        fetch('../../BACKEND/door/register.php', {
             method: 'POST',
             body: formData
         })
@@ -169,7 +169,7 @@
         .then(data => {
             alert(data.message);
             if(data.status === 'success'){
-                window.location.href = 'login.html';
+                window.location.href = '../home/login.html';
             }
         })
         .catch(err => console.error('Error:', err));
