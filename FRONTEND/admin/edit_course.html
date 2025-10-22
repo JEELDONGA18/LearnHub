@@ -137,51 +137,104 @@
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const courseId = parseInt(urlParams.get('id'));
-    const courses = JSON.parse(localStorage.getItem('courses')) || [];
-    const course = courses.find(c => c.id === courseId);
+  // read id from query string
+  const urlParams = new URLSearchParams(window.location.search);
+  const courseId = parseInt(urlParams.get('id'), 10);
 
-    const titleInput = document.getElementById('title');
-    const descriptionInput = document.getElementById('description');
-    const videoUrlInput = document.getElementById('videoUrl');
-    const imageUrlInput = document.getElementById('imageUrl');
-    const categoryInput = document.getElementById('category');
-    const successMsg = document.getElementById('successMsg');
+const id = urlParams.get('id');
 
-    // Preload course data
-    if(course){
-      titleInput.value = course.title;
-      descriptionInput.value = course.description;
-      videoUrlInput.value = course.videoUrl;
-      imageUrlInput.value = course.imageUrl;
-      categoryInput.value = course.category;
+if (id) {
+  fetch(`edit_course.php?id=${id}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('course_name').value = data.course_name;
+      // etc.
+    });
+} else {
+  alert('Invalid action');
+  window.location.href = 'admin_dashboard.html';
+}
+
+  // if (!courseId || isNaN(courseId)) {
+  //   alert("Invalid course id");
+  //   window.location.href = "admin_dashboard.html";
+  // }
+
+  // form elements
+  const titleInput = document.getElementById('title');
+  const descriptionInput = document.getElementById('description');
+  const videoUrlInput = document.getElementById('videoUrl');
+  const imageUrlInput = document.getElementById('imageUrl');
+  const categoryInput = document.getElementById('category');
+  const successMsg = document.getElementById('successMsg');
+
+  // fetch course from backend
+fetch(`../../BACKEND/admin/admin_manage_courses.php?action=fetch`)
+  .then(res => res.json())
+  .then(resp => {
+    if (resp.status === 'success' && resp.data) {
+      const course = resp.data.find(c => c.course_id == courseId);
+      if (!course) {
+        alert('Course not found!');
+        window.location.href = 'admin_dashboard.html';
+        return;
+      }
+      titleInput.value = course.title ?? '';
+      descriptionInput.value = course.description ?? '';
+      videoUrlInput.value = course.video_url ?? '';
+      imageUrlInput.value = course.image_url ?? '';
+      categoryInput.value = course.category ?? '';
     } else {
-      alert("Course not found!");
-      window.location.href = "admin_dashboard.html";
+      alert(resp.message || 'Course not found!');
+      window.location.href = 'admin_dashboard.html';
+    }
+  })
+
+    .catch(err => {
+      console.error('Fetch course error', err);
+      alert('Could not load course. Check console/network.');
+      window.location.href = 'admin_dashboard.html';
+    });
+
+  // handle form submit -> call edit action
+  const editForm = document.getElementById('editCourseForm');
+  editForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const payload = {
+      course_id: courseId,
+      title: titleInput.value.trim(),
+      description: descriptionInput.value.trim(),
+      video_url: videoUrlInput.value.trim(),
+      image_url: imageUrlInput.value.trim(),
+      category: categoryInput.value
+    };
+
+    // Basic validation
+    if (!payload.title || !payload.description) {
+      alert('Please fill required fields');
+      return;
     }
 
-    // Handle form submission
-    const editForm = document.getElementById('editCourseForm');
-    editForm.addEventListener('submit', function(e){
-      e.preventDefault();
-
-      course.title = titleInput.value.trim();
-      course.description = descriptionInput.value.trim();
-      course.videoUrl = videoUrlInput.value.trim();
-      course.imageUrl = imageUrlInput.value.trim();
-      course.category = categoryInput.value;
-
-      // Update localStorage
-      localStorage.setItem('courses', JSON.stringify(courses));
-
-      successMsg.textContent = "Course updated successfully!";
-
-      // Redirect after delay
-      setTimeout(() => {
-        window.location.href = "admin_dashboard.html";
-      }, 1500);
+    fetch('../../BACKEND/admin/admin_manage_courses.php?action=edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        successMsg.textContent = data.message || 'Course updated successfully!';
+        setTimeout(() => window.location.href = 'admin_dashboard.html', 1200);
+      } else {
+        alert(data.message || 'Error updating course');
+      }
+    })
+    .catch(err => {
+      console.error('Update error', err);
+      alert('Request failed. Check console/network.');
     });
-  </script>
+  });
+</script>
 </body>
 </html>

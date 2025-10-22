@@ -98,7 +98,7 @@
 
     async function loadCourse() {
       try {
-        const res = await fetch('../../BACKEND/home/course_detail.php?id=${courseId}');
+        const res = await fetch(`../../BACKEND/home/course_detail.php?id=${courseId}`);
         // const res = await fetch(../../BACKEND/course_detail.php?id=${courseId});
         const data = await res.json();
 
@@ -128,7 +128,8 @@
           });
 
         } else {
-          container.innerHTML = <p>${data.message}</p>;
+          container.innerHTML = `<p>${data.message}</p>`;
+
         }
 
       } catch (err) {

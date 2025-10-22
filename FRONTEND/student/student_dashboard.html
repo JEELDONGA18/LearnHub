@@ -218,9 +218,9 @@
     // Populate enrolled courses
     const container = document.getElementById('enrolledCourses');
     enrolledCourses.forEach(id => {
-      const c = courses.find(course=>course.id===id);
+      const c = courses.find(course=>course.id===id);   
       const card = document.createElement('div');
-      card.classList.add('course-card');
+      card.classList.add('course-card');    
       card.innerHTML = `
         <h4>${c.title}</h4>
         <p>${c.description}</p>
@@ -230,7 +230,7 @@
       `;
       container.appendChild(card);
     });
-    function viewCourse(id){ window.location.href = `course_detail.html?id=${id}`; }
+    function viewCourse(id){ window.location.href = `../home/course_detail.html?id=${id}`; }
 
     // Chart.js - Line chart for progress over time
     const ctx = document.getElementById('progressChart').getContext('2d');

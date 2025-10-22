@@ -201,13 +201,13 @@ const courseGrid = document.getElementById("courseGrid");
 // Fetch courses from backend
 async function loadCourses() {
   try {
-    const res = await fetch('../../BACKEND/fetch_courses.php'); // adjust path
+    const res = await fetch('../../BACKEND/home/course_detail.php'); // adjust path
     const data = await res.json();
 
     if(data.status === 'success'){
       renderCourses(data.courses);
     } else {
-      courseGrid.innerHTML = <p>No courses found.</p>;
+      courseGrid.innerHTML = <p>No courses found. </p>
     }
   } catch(err) {
     console.error("Error fetching courses:", err);
