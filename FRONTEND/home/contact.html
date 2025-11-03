@@ -111,13 +111,28 @@
 </head>
 <body>
   <!-- Navbar -->
-  <div id="navbar"></div>
-  <script>
-    fetch('navbar.html')
-      .then(res => res.text())
-      .then(data => document.getElementById('navbar').innerHTML = data);
-  </script>
+<!-- Placeholder for navbar -->
 
+<<div id="navbarContainer"></div>
+<script>
+console.log("🚀 Loading navbar...");
+fetch("navbar.html")
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById("navbarContainer").innerHTML = html;
+    console.log("✅ Navbar HTML loaded");
+
+    // Now load navbar.js
+    const script = document.createElement("script");
+    script.src = "navbar.js";
+    script.onload = () => {
+      console.log("✅ Navbar JS executed");
+      initNavbar(); // This ensures everything exists
+    };
+    document.body.appendChild(script);
+  })
+  .catch(err => console.error("❌ Navbar load failed:", err));
+</script>
   <!-- Hero Section -->
   <section class="hero">
     <h2>Contact Us</h2>

@@ -123,6 +123,7 @@
       }
     }
   </style>
+  <script src="navbar.js"></script>
 </head>
 <body>
   <header>
@@ -149,62 +150,6 @@
     </nav>
   </header>
 
-  <script>
-    console.log("🟢 Navbar script loaded!");
-    document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ DOM is ready");
-  alert("JS is working!");
-});
-    document.addEventListener("DOMContentLoaded", function () {
-      const menuIcon = document.getElementById("menuIcon");
-      const navbar = document.getElementById("navbar");
-      const authLinks = document.getElementById("authLinks");
-      const userSection = document.getElementById("userSection");
-      const userName = document.getElementById("userName");
-      const logoutBtn = document.getElementById("logoutBtn");
-
-      // Toggle mobile menu
-      menuIcon.addEventListener("click", () => {
-        navbar.classList.toggle("show");
-        menuIcon.textContent = navbar.classList.contains("show") ? "✖" : "☰";
-      });
-
-      // ✅ Check if user is logged in
-      fetch("../../BACKEND/door/check_session.php", {
-  credentials: "include"
-})
-        
-        .then(res => res.json())
-        .then(data => {
-          if (data.logged_in) {
-            console.log(`✅ Session active — Welcome back, ${data.name}!`);
-            authLinks.style.display = "none";
-            userSection.style.display = "flex";
-            userName.textContent = data.name; // Display user's name
-          } else {
-            authLinks.style.display = "flex";
-            userSection.style.display = "none";
-          }
-        })
-        
-        .catch(err => console.error("Session check error:", err));
-
-      // ✅ Logout functionality
-      logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        fetch("../../BACKEND/door/logout.php")
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === "success") {
-              // Clear UI and redirect
-              authLinks.style.display = "flex";
-              userSection.style.display = "none";
-              window.location.href = "../door/login.html";
-            }
-          })
-          .catch(err => console.error("Logout error:", err));
-      });
-    });
-  </script>
+ 
 </body>
 </html>

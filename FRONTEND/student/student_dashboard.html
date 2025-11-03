@@ -42,9 +42,14 @@
       color: #fff;
     }
 
+    .navbar > div {
+      display: flex;
+      gap: 10px;
+    }
+
     /* ===== DASHBOARD ===== */
     .dashboard { padding: 40px 10%; }
-    
+
     /* ===== PROFILE CARD ===== */
     .profile-card {
       display: flex;
@@ -70,11 +75,13 @@
 
     .profile-info h3 { margin: 0 0 5px 0; color: #ff6600; }
     .profile-info p { margin: 3px 0; font-weight: 500; }
+
     .profile-stats {
       display: flex;
       gap: 20px;
       flex-wrap: wrap;
     }
+
     .stat {
       background: rgba(255,102,0,0.1);
       padding: 12px 18px;
@@ -133,32 +140,31 @@
       transition: all 0.3s;
     }
     .course-card button:hover { background: #ff751a; }
-    .navbar > div {
-      display: flex;
-      gap: 10px;
-    }
 
     /* ===== RESPONSIVE ===== */
-    @media (max-width:768px){ .profile-card{flex-direction:column;align-items:flex-start;} .navbar{flex-direction:column;gap:10px;} }
+    @media (max-width:768px){
+      .profile-card{flex-direction:column;align-items:flex-start;}
+      .navbar{flex-direction:column;gap:10px;}
+    }
   </style>
 </head>
 <body>
   <!-- Navbar -->
- <div class="navbar">
-    <h2>LearnHub Student Dashboard</h2>
-        <div> 
-            <button id="allCoursesBtn">All Courses</button> 
-      <button id="logoutBtn">Logout</button>
-    </div>
-  </div>
+  <div class="navbar">
+    <h2>LearnHub Student Dashboard</h2>
+    <div> 
+      <button id="allCoursesBtn">All Courses</button> 
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
 
   <div class="dashboard">
     <!-- Profile Card -->
     <div class="profile-card">
       <img src="/FRONTEND/Images/profile.jpg" alt="Profile Image" class="profile-img">
       <div class="profile-info">
-        <h3 id="studentName">Student Name</h3>
-        <p id="studentEmail">student@example.com</p>
+        <h3 id="studentName">Loading...</h3>
+        <p id="studentEmail">Loading...</p>
       </div>
       <div class="profile-stats">
         <div class="stat">
@@ -190,85 +196,94 @@
   </div>
 
   <script>
-  document.getElementById('logoutBtn').addEventListener('click', function() {
-  fetch('../../BACKEND/door/logout.php')
+  console.log("🟢 Dashboard script loaded!");
+
+  // 🔹 Step 1: Check session from backend
+  fetch("../../BACKEND/door/check_session.php")
     .then(res => res.json())
     .then(data => {
-      if (data.status === "success") {
-        window.location.href = "../home/home.html"; // ✅ Redirect after logout
+      console.log("✅ Session check response:", data);
+      if (!data.logged_in) {
+        console.warn("⚠ No session found. Redirecting to login...");
+        window.location.href = "../../FRONTEND/door/login.html";
+        return;
       }
+
+      // 🔹 Step 2: Fill profile info
+      document.getElementById("studentName").textContent = data.name;
+      document.getElementById("studentEmail").textContent = data.email;
+
+      // Sample static course data
+      const enrolledCourses = [1, 2, 3];
+      const courses = [
+        {id:1,title:"Web Development",description:"Learn HTML, CSS, JS",progress:75, history:[10,20,40,60,75]},
+        {id:2,title:"Python Programming",description:"Master Python",progress:50, history:[5,15,25,35,50]},
+        {id:3,title:"AI & ML",description:"Build AI models",progress:30, history:[5,10,15,20,30]},
+        {id:4,title:"Data Analytics",description:"Analyze data",progress:0, history:[0,0,0,0,0]}
+      ];
+
+      document.getElementById("coursesCount").textContent = enrolledCourses.length;
+
+      let completed = 0;
+      enrolledCourses.forEach(id => { if(courses.find(c=>c.id===id).progress>=100) completed++; });
+      document.getElementById("completedCount").textContent = completed;
+
+      let totalProgress = 0;
+      enrolledCourses.forEach(id => { totalProgress += courses.find(c=>c.id===id).progress; });
+      const overall = enrolledCourses.length ? Math.round(totalProgress/enrolledCourses.length) : 0;
+      document.getElementById("overallProgress").textContent = overall + "%";
+
+      const container = document.getElementById("enrolledCourses");
+      enrolledCourses.forEach(id => {
+        const c = courses.find(course=>course.id===id);   
+        const card = document.createElement("div");
+        card.classList.add("course-card");    
+        card.innerHTML = `
+          <h4>${c.title}</h4>
+          <p>${c.description}</p>
+          <div class="progress-bar" style="width:${c.progress}%"></div>
+          <p><strong>${c.progress}% Completed</strong></p>
+          <button onclick="viewCourse(${c.id})">View Course</button>
+        `;
+        container.appendChild(card);
+      });
+
+      const ctx = document.getElementById("progressChart").getContext("2d");
+      const labels = ["Week 1","Week 2","Week 3","Week 4","Week 5"];
+      const datasets = enrolledCourses.map(id=>{
+        const c = courses.find(course=>course.id===id);
+        return {
+          label: c.title,
+          data: c.history,
+          fill:false,
+          borderColor: 'rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*150)},0,0.8)',
+          tension:0.4
+        };
+      });
+      new Chart(ctx,{type:'line',data:{labels, datasets}, options:{responsive:true, plugins:{legend:{position:'top'}}}});
     })
-    .catch(err => console.error(err));
-});
+    .catch(err => console.error("❌ Error checking session:", err));
 
-    // Sample student and courses
-    const student = JSON.parse(sessionStorage.getItem('student')) || { name: "John Doe", email: "john@example.com" };
-    const enrolledCourses = JSON.parse(localStorage.getItem('enrolledCourses')) || [1,2,3];
-    const courses = [
-      {id:1,title:"Web Development",description:"Learn HTML, CSS, JS",progress:75, history:[10,20,40,60,75]},
-      {id:2,title:"Python Programming",description:"Master Python",progress:50, history:[5,15,25,35,50]},
-      {id:3,title:"AI & ML",description:"Build AI models",progress:30, history:[5,10,15,20,30]},
-      {id:4,title:"Data Analytics",description:"Analyze data",progress:0, history:[0,0,0,0,0]}
-    ];
+  // 🔹 Step 3: Buttons
+  document.getElementById('allCoursesBtn').addEventListener('click', () => {
+    window.location.href = '../home/courses.html'; 
+  });
 
-    // Set profile info
-    document.getElementById('studentName').textContent = student.name;
-    document.getElementById('studentEmail').textContent = student.email;
-    document.getElementById('coursesCount').textContent = enrolledCourses.length;
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    fetch('../../BACKEND/door/logout.php')
+      .then(res => res.json())
+      .then(data => {
+        console.log("🟡 Logout response:", data);
+        if (data.status === "success") {
+          window.location.href = "../home/home.html";
+        }
+      })
+      .catch(err => console.error("❌ Logout error:", err));
+  });
 
-    // Calculate completed courses
-    let completed = 0;
-    enrolledCourses.forEach(id => { if(courses.find(c=>c.id===id).progress>=100) completed++; });
-    document.getElementById('completedCount').textContent = completed;
-
-    // Overall progress
-    let totalProgress = 0;
-    enrolledCourses.forEach(id => { totalProgress += courses.find(c=>c.id===id).progress; });
-    const overall = enrolledCourses.length ? Math.round(totalProgress/enrolledCourses.length) : 0;
-    document.getElementById('overallProgress').textContent = overall + "%";
-
-    // Populate enrolled courses
-    const container = document.getElementById('enrolledCourses');
-    enrolledCourses.forEach(id => {
-      const c = courses.find(course=>course.id===id);   
-      const card = document.createElement('div');
-      card.classList.add('course-card');    
-      card.innerHTML = `
-        <h4>${c.title}</h4>
-        <p>${c.description}</p>
-        <div class="progress-bar" style="width:${c.progress}%"></div>
-        <p><strong>${c.progress}% Completed</strong></p>
-        <button onclick="viewCourse(${c.id})">View Course</button>
-      `;
-      container.appendChild(card);
-    });
-    function viewCourse(id){ window.location.href = `../home/course_detail.html?id=${id}`; }
-
-    // Chart.js - Line chart for progress over time
-    const ctx = document.getElementById('progressChart').getContext('2d');
-    const labels = ["Week 1","Week 2","Week 3","Week 4","Week 5"];
-    const datasets = enrolledCourses.map(id=>{
-      const c = courses.find(course=>course.id===id);
-      return {
-        label: c.title,
-        data: c.history,
-        fill:false,
-        borderColor: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*150)},0,0.8)`,
-        tension:0.4
-      };
-    });
-    new Chart(ctx,{type:'line',data:{labels, datasets}, options:{responsive:true, plugins:{legend:{position:'top'}}}});
-    // New: Event listener for All Courses button
-    document.getElementById('allCoursesBtn').addEventListener('click', () => {
-      // This path goes up one folder (..) and then into the home/ folder
-      window.location.href = '../home/courses.html'; 
-    });
-
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      sessionStorage.clear();
-      window.location.href = '../home/home.html';
-    });
+  function viewCourse(id){
+    window.location.href = `./home/course_detail.html?id=${id}`;
+  }
   </script>
 </body>
 </html>
