@@ -175,6 +175,7 @@
   <div id="navbar"></div>
   <script>
     fetch("navbar.html")
+    
       .then(res => res.text())
       .then(data => document.getElementById("navbar").innerHTML = data);
   </script>
@@ -207,11 +208,11 @@ async function loadCourses() {
     if(data.status === 'success'){
       renderCourses(data.courses);
     } else {
-      courseGrid.innerHTML = <p>No courses found. </p>
+      courseGrid.innerHTML = "<p>No courses found. </p>";
     }
   } catch(err) {
     console.error("Error fetching courses:", err);
-    courseGrid.innerHTML = <p>Failed to load courses.</p>;
+    courseGrid.innerHTML = "<p>Failed to load courses.</p>;";
   }
 }
 

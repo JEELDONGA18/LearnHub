@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Navbar</title>
+  <title>Navbar | LearnHub</title>
   <style>
     body {
       margin: 0;
@@ -27,7 +27,6 @@
       color: #ff6600;
       font-weight: 700;
       font-size: 1.8rem;
-      letter-spacing: 0.5px;
       margin: 0;
     }
 
@@ -45,7 +44,6 @@
       border-radius: 6px;
     }
 
-    /* Normal links */
     nav a:not(.btn) {
       color: #333;
     }
@@ -55,7 +53,6 @@
       transform: scale(1.05);
     }
 
-    /* Special buttons */
     nav a.btn {
       background: linear-gradient(90deg, #ff8c00, #ff6600);
       color: white;
@@ -67,7 +64,23 @@
       transform: translateY(-2px);
     }
 
-    /* Hamburger Icon */
+    /* User profile display */
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: #ff6600;
+    }
+
+    .user-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #ff6600;
+    }
+
+    /* Hamburger icon for mobile */
     .menu-icon {
       display: none;
       font-size: 1.8rem;
@@ -76,7 +89,6 @@
       user-select: none;
     }
 
-    /* Mobile Styles */
     @media (max-width: 768px) {
       .menu-icon {
         display: block;
@@ -121,20 +133,76 @@
       <a href="../home/home.html#features">Features</a>
       <a href="courses.html">Courses</a>
       <a href="contact.html">Contact</a>
-      <a href="../door/login.html" class="btn">Login</a>
-      <a href="../door/register.html" class="btn">Register</a>
+
+      <!-- Default links -->
+      <div id="authLinks">
+        <a href="../door/login.html" class="btn">Login</a>
+        <a href="../door/register.html" class="btn">Register</a>
+      </div>
+
+      <!-- User section (hidden by default) -->
+      <div id="userSection" class="user-info" style="display: none;">
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User Icon">
+        <span id="userName"></span>
+        <a href="#" id="logoutBtn" style="margin-left:10px; color:#ff6600; text-decoration:underline;">Logout</a>
+      </div>
     </nav>
   </header>
 
   <script>
+    console.log("🟢 Navbar script loaded!");
+    document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOM is ready");
+  alert("JS is working!");
+});
     document.addEventListener("DOMContentLoaded", function () {
       const menuIcon = document.getElementById("menuIcon");
       const navbar = document.getElementById("navbar");
+      const authLinks = document.getElementById("authLinks");
+      const userSection = document.getElementById("userSection");
+      const userName = document.getElementById("userName");
+      const logoutBtn = document.getElementById("logoutBtn");
 
+      // Toggle mobile menu
       menuIcon.addEventListener("click", () => {
         navbar.classList.toggle("show");
-
         menuIcon.textContent = navbar.classList.contains("show") ? "✖" : "☰";
+      });
+
+      // ✅ Check if user is logged in
+      fetch("../../BACKEND/door/check_session.php", {
+  credentials: "include"
+})
+        
+        .then(res => res.json())
+        .then(data => {
+          if (data.logged_in) {
+            console.log(`✅ Session active — Welcome back, ${data.name}!`);
+            authLinks.style.display = "none";
+            userSection.style.display = "flex";
+            userName.textContent = data.name; // Display user's name
+          } else {
+            authLinks.style.display = "flex";
+            userSection.style.display = "none";
+          }
+        })
+        
+        .catch(err => console.error("Session check error:", err));
+
+      // ✅ Logout functionality
+      logoutBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        fetch("../../BACKEND/door/logout.php")
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "success") {
+              // Clear UI and redirect
+              authLinks.style.display = "flex";
+              userSection.style.display = "none";
+              window.location.href = "../door/login.html";
+            }
+          })
+          .catch(err => console.error("Logout error:", err));
       });
     });
   </script>

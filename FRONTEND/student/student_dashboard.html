@@ -133,6 +133,10 @@
       transition: all 0.3s;
     }
     .course-card button:hover { background: #ff751a; }
+    .navbar > div {
+      display: flex;
+      gap: 10px;
+    }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width:768px){ .profile-card{flex-direction:column;align-items:flex-start;} .navbar{flex-direction:column;gap:10px;} }
@@ -140,10 +144,13 @@
 </head>
 <body>
   <!-- Navbar -->
-  <div class="navbar">
-    <h2>LearnHub Student Dashboard</h2>
-    <button id="logoutBtn">Logout</button>
-  </div>
+ <div class="navbar">
+    <h2>LearnHub Student Dashboard</h2>
+        <div> 
+            <button id="allCoursesBtn">All Courses</button> 
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
 
   <div class="dashboard">
     <!-- Profile Card -->
@@ -183,11 +190,16 @@
   </div>
 
   <script>
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      sessionStorage.clear();
-      window.location.href = '../home/home.html';
-    });
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+  fetch('../../BACKEND/door/logout.php')
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        window.location.href = "../home/home.html"; // ✅ Redirect after logout
+      }
+    })
+    .catch(err => console.error(err));
+});
 
     // Sample student and courses
     const student = JSON.parse(sessionStorage.getItem('student')) || { name: "John Doe", email: "john@example.com" };
@@ -246,6 +258,17 @@
       };
     });
     new Chart(ctx,{type:'line',data:{labels, datasets}, options:{responsive:true, plugins:{legend:{position:'top'}}}});
+    // New: Event listener for All Courses button
+    document.getElementById('allCoursesBtn').addEventListener('click', () => {
+      // This path goes up one folder (..) and then into the home/ folder
+      window.location.href = '../home/courses.html'; 
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = '../home/home.html';
+    });
   </script>
 </body>
 </html>
