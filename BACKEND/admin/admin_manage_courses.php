@@ -24,19 +24,24 @@ switch ($action) {
     case 'add':
         $data = json_decode(file_get_contents("php://input"), true);
 
-        $title = $data['title'] ?? '';
-        $description = $data['description'] ?? '';
-        $video_url = $data['video_url'] ?? '';
-        $image_url = $data['image_url'] ?? '';
-        $category = $data['category'] ?? '';
+        $title = trim($data['title'] ?? '');
+        $description = trim($data['description'] ?? '');
+        $youtube_video_id = trim($data['youtube_video_id'] ?? '');
+        $youtube_playlist_id = trim($data['youtube_playlist_id'] ?? '');
+        $video_count = intval($data['video_count'] ?? 1);
+        $image_url = trim($data['image_url'] ?? '');
+        $category = trim($data['category'] ?? '');
 
         if (empty($title) || empty($description) || empty($category)) {
             echo json_encode(['status' => 'error', 'message' => 'All required fields must be filled']);
             exit;
         }
 
-        $stmt = $conn->prepare("INSERT INTO courses (title, description, video_url, image_url, category) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $title, $description, $video_url, $image_url, $category);
+        $stmt = $conn->prepare("
+            INSERT INTO courses (title, description, youtube_video_id, youtube_playlist_id, video_count, image_url, category)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param("ssssiss", $title, $description, $youtube_video_id, $youtube_playlist_id, $video_count, $image_url, $category);
 
         if ($stmt->execute()) {
             echo json_encode(['status' => 'success', 'message' => 'Course added successfully']);
@@ -51,20 +56,26 @@ switch ($action) {
     case 'edit':
         $data = json_decode(file_get_contents("php://input"), true);
 
-        $course_id = $data['course_id'] ?? '';
-        $title = $data['title'] ?? '';
-        $description = $data['description'] ?? '';
-        $video_url = $data['video_url'] ?? '';
-        $image_url = $data['image_url'] ?? '';
-        $category = $data['category'] ?? '';
+        $course_id = intval($data['course_id'] ?? 0);
+        $title = trim($data['title'] ?? '');
+        $description = trim($data['description'] ?? '');
+        $youtube_video_id = trim($data['youtube_video_id'] ?? '');
+        $youtube_playlist_id = trim($data['youtube_playlist_id'] ?? '');
+        $video_count = intval($data['video_count'] ?? 1);
+        $image_url = trim($data['image_url'] ?? '');
+        $category = trim($data['category'] ?? '');
 
         if (empty($course_id) || empty($title) || empty($description)) {
             echo json_encode(['status' => 'error', 'message' => 'Invalid data']);
             exit;
         }
 
-        $stmt = $conn->prepare("UPDATE courses SET title=?, description=?, video_url=?, image_url=?, category=? WHERE course_id=?");
-        $stmt->bind_param("sssssi", $title, $description, $video_url, $image_url, $category, $course_id);
+        $stmt = $conn->prepare("
+            UPDATE courses 
+            SET title=?, description=?, youtube_video_id=?, youtube_playlist_id=?, video_count=?, image_url=?, category=?
+            WHERE course_id=?
+        ");
+        $stmt->bind_param("ssssiisi", $title, $description, $youtube_video_id, $youtube_playlist_id, $video_count, $image_url, $category, $course_id);
 
         if ($stmt->execute()) {
             echo json_encode(['status' => 'success', 'message' => 'Course updated successfully']);
@@ -78,7 +89,7 @@ switch ($action) {
     // ================= DELETE COURSE =================
     case 'delete':
         $data = json_decode(file_get_contents("php://input"), true);
-        $course_id = $data['course_id'] ?? '';
+        $course_id = intval($data['course_id'] ?? 0);
 
         if (empty($course_id)) {
             echo json_encode(['status' => 'error', 'message' => 'Course ID missing']);

@@ -115,8 +115,14 @@
       <label for="description">Description</label>
       <textarea id="description" placeholder="Enter course description" required></textarea>
 
-      <label for="videoUrl">Video URL (YouTube)</label>
-      <input type="url" id="videoUrl" placeholder="Enter video URL" required>
+      <label for="videoId">YouTube Video ID (if single video)</label>
+      <input type="text" id="videoId" placeholder="e.g. dQw4w9WgXcQ">
+
+      <label for="playlistId">YouTube Playlist ID (if playlist)</label>
+      <input type="text" id="playlistId" placeholder="e.g. PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG">
+
+      <label for="videoCount">Number of Videos (default 1 for single video)</label>
+      <input type="number" id="videoCount" min="1" value="1">
 
       <label for="imageUrl">Course Image URL</label>
       <input type="url" id="imageUrl" placeholder="Enter image URL" required>
@@ -138,56 +144,66 @@
   </div>
 
 <script>
-    const courseForm = document.getElementById('courseForm');
-    const successMsg = document.getElementById('successMsg');
-    const errorMsg = document.getElementById('errorMsg');
+const courseForm = document.getElementById('courseForm');
+const successMsg = document.getElementById('successMsg');
+const errorMsg = document.getElementById('errorMsg');
 
-    courseForm.addEventListener('submit', function(e){
-      e.preventDefault();
+courseForm.addEventListener('submit', function(e) {
+  e.preventDefault();
 
-      successMsg.textContent = '';
-      errorMsg.textContent = '';
+  successMsg.textContent = '';
+  errorMsg.textContent = '';
 
-      const title = document.getElementById('title').value.trim();
-      const description = document.getElementById('description').value.trim();
-      const video_url = document.getElementById('videoUrl').value.trim();
-      const image_url = document.getElementById('imageUrl').value.trim();
-      const category = document.getElementById('category').value;
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const youtube_video_id = document.getElementById('videoId').value.trim();
+  const youtube_playlist_id = document.getElementById('playlistId').value.trim();
+  const video_count = parseInt(document.getElementById('videoCount').value) || 1;
+  const image_url = document.getElementById('imageUrl').value.trim();
+  const category = document.getElementById('category').value;
 
-      if(!title || !description || !video_url || !image_url || !category) return;
+  if(!title || !description || !image_url || !category) {
+    errorMsg.textContent = "Please fill all required fields.";
+    return;
+  }
+if (!youtube_video_id && !youtube_playlist_id) {
+  errorMsg.textContent = "Please enter either a YouTube Video ID or a Playlist ID.";
+  return;
+}
+  // Prepare payload
+  const payload = {
+    title,
+    description,
+    youtube_video_id,
+    youtube_playlist_id,
+    video_count,
+    image_url,
+    category
+  };
 
-      // Prepare payload
-      const payload = {
-        title,
-        description,
-        video_url,
-        image_url,
-        category
-      };
+  fetch('../../BACKEND/admin/admin_manage_courses.php?action=add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.status === 'success'){
+      successMsg.textContent = data.message;
+      courseForm.reset();
+      setTimeout(()=> {
+        window.location.href = 'admin_dashboard.html';
+      }, 1500);
+    } else {
+      errorMsg.textContent = data.message;
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    errorMsg.textContent = 'Something went wrong. Try again.';
+  });
+});
+</script>
 
-      fetch('../../BACKEND/admin/admin_manage_courses.php?action=add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if(data.status === 'success'){
-          successMsg.textContent = data.message;
-          courseForm.reset();
-          // Optional redirect
-          setTimeout(()=> {
-            window.location.href = 'admin_dashboard.html';
-          }, 1500);
-        } else {
-          errorMsg.textContent = data.message;
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        errorMsg.textContent = 'Something went wrong. Try again.';
-      });
-    });
-  </script>
 </body>
 </html>

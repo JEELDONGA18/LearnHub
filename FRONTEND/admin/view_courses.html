@@ -23,10 +23,7 @@
     top: 0;
     z-index: 10;
   }
-    .navbar h2 { 
-        margin: 0; 
-        color: #fff;
-    }
+  .navbar h2 { margin: 0; color: #fff; }
   .navbar button {
     background: white;
     color: #ff6600;
@@ -72,19 +69,9 @@
     object-fit: cover;
   }
 
-  .course-info {
-    flex: 1;
-  }
-
-  .course-info h4 {
-    margin: 0 0 6px 0;
-    color: #ff6600;
-  }
-  .course-info p {
-    margin: 0;
-    color: #555;
-    font-size: 0.95rem;
-  }
+  .course-info { flex: 1; }
+  .course-info h4 { margin: 0 0 6px 0; color: #ff6600; }
+  .course-info p { margin: 0; color: #555; font-size: 0.95rem; }
 
   .actions button {
     margin-left: 10px;
@@ -101,6 +88,12 @@
 
   .actions button.delete { background: #ff8a80; color: #fff; }
   .actions button.delete:hover { background: #ff5252; }
+
+  .meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
@@ -119,60 +112,70 @@ const coursesContainer = document.getElementById('coursesContainer');
 
 // Fetch all courses
 async function fetchCourses() {
+  try {
     const res = await fetch('../../BACKEND/admin/admin_manage_courses.php?action=fetch');
     const data = await res.json();
 
     if (data.status === 'success') {
-        renderCourses(data.data);
+      renderCourses(data.data);
     } else {
-        coursesContainer.innerHTML = `<p>${data.message}</p>`;
+      coursesContainer.innerHTML = <p>${data.message}</p>;
     }
+  } catch (err) {
+    console.error('Error fetching courses:', err);
+    coursesContainer.innerHTML = '<p>Failed to load courses.</p>';
+  }
 }
 
 function renderCourses(courses) {
-    coursesContainer.innerHTML = '<h2>Manage Courses</h2>';
+  coursesContainer.innerHTML = '<h2>Manage Courses</h2>';
 
-    if (courses.length === 0) {
-        coursesContainer.innerHTML += '<p>No courses found. Please add courses.</p>';
-        return;
-    }
+  if (!courses || courses.length === 0) {
+    coursesContainer.innerHTML += '<p>No courses found. Please add courses.</p>';
+    return;
+  }
 
-    courses.forEach(course => {
-        const card = document.createElement('div');
-        card.className = 'course-card';
-        card.innerHTML = `
-            <img src="${course.image_url}" alt="${course.title}">
-            <div class="course-info">
-                <h4>${course.title}</h4>
-                <p>${course.description.substring(0,60)}...</p>
-                <p>Category: ${course.category}</p>
-            </div>
-            <div class="actions">
-                <button class="edit" onclick="editCourse(${course.course_id})">Edit</button>
-                <button class="delete" onclick="deleteCourse(${course.course_id})">Delete</button>
-            </div>
-        `;
-        coursesContainer.appendChild(card);
-    });
+  courses.forEach(course => {
+    const isPlaylist = course.youtube_playlist_id && course.youtube_playlist_id.trim() !== "";
+    const videoType = isPlaylist ? "Playlist" : "Single Video";
+    const videoCount = isPlaylist ? ${course.video_count} Videos : "1 Video";
+
+    const card = document.createElement('div');
+    card.className = 'course-card';
+    card.innerHTML = `
+      <img src="${course.image_url || 'https://via.placeholder.com/120x80'}" alt="${course.title}">
+      <div class="course-info">
+        <h4>${course.title}</h4>
+        <p>${(course.description || '').substring(0, 60)}...</p>
+        <p>Category: ${course.category}</p>
+        <p class="meta">Type: ${videoType} | ${videoCount}</p>
+      </div>
+      <div class="actions">
+        <button class="edit" onclick="editCourse(${course.course_id})">Edit</button>
+        <button class="delete" onclick="deleteCourse(${course.course_id})">Delete</button>
+      </div>
+    `;
+    coursesContainer.appendChild(card);
+  });
 }
 
 function editCourse(id) {
-    window.location.href = `edit_course.html?id=${id}`;
+  window.location.href = edit_course.html?id=${id};
 }
 
 // Delete course using unified PHP
 async function deleteCourse(id) {
-    if(!confirm('Are you sure you want to delete this course?')) return;
+  if (!confirm('Are you sure you want to delete this course?')) return;
 
-    const res = await fetch('../../BACKEND/admin/admin_manage_courses.php?action=delete', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({course_id: id})
-    });
+  const res = await fetch('../../BACKEND/admin/admin_manage_courses.php?action=delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ course_id: id })
+  });
 
-    const data = await res.json();
-    alert(data.message);
-    if (data.status === 'success') fetchCourses(); // refresh
+  const data = await res.json();
+  alert(data.message);
+  if (data.status === 'success') fetchCourses(); // refresh
 }
 
 // Initial fetch
